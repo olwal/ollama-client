@@ -43,3 +43,6 @@ Thumbs.db
 examples/*/bin/
 examples/*/obj/
 examples/*/.vs/
+ 
+# Archive files
+*.zip

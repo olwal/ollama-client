@@ -22,22 +22,30 @@ A cross-framework C++ client library for [Ollama](https://ollama.ai/) API with s
 
 class ofApp : public ofBaseApp {
     OllamaClientOF ollama;
-    ofVideoGrabber camera;
+    ofFbo drawingCanvas;
 
     void setup() {
-        camera.setup(640, 480);
-        // Default: localhost:11434, llava:7b vision model
+        drawingCanvas.allocate(512, 512, GL_RGBA);
+        drawingCanvas.begin();
+        ofClear(255, 255, 255, 255);
+        drawingCanvas.end();
     }
 
-    void analyzeFrame() {
-        ollama.sendPixelsForInference(
-            camera.getPixels(),
-            "Describe what you see in this image",
-            [](const string& result, void* userData) {
-                ofLogNotice() << "AI says: " << result;
-            },
-            this
-        );
+    void keyPressed(int key) {
+        if (key == ' ') {
+            // Analyze the drawing
+            ofPixels pixels;
+            drawingCanvas.readToPixels(pixels);
+
+            ollama.sendPixelsForInference(
+                pixels,
+                "What do you see in this drawing?",
+                [](const string& result, void* userData) {
+                    ofLogNotice() << "AI says: " << result;
+                },
+                this
+            );
+        }
     }
 };
 ```
@@ -166,6 +174,38 @@ string sendTextureForInferenceSync(const ci::gl::Texture& texture, const string&
 ```
 
 ## Usage Examples
+
+### Camera/Webcam Analysis with OpenFrameworks
+
+```cpp
+class ofApp : public ofBaseApp {
+    OllamaClientOF ollama;
+    ofVideoGrabber camera;
+    float lastAnalysisTime;
+
+    void setup() {
+        camera.setup(640, 480);
+        lastAnalysisTime = 0;
+    }
+
+    void update() {
+        camera.update();
+
+        // Analyze every 5 seconds
+        if (ofGetElapsedTimef() - lastAnalysisTime > 5.0f) {
+            ollama.sendPixelsForInference(
+                camera.getPixels(),
+                "Describe what you see",
+                [](const string& result, void* userData) {
+                    ofLogNotice() << "Camera: " << result;
+                },
+                this
+            );
+            lastAnalysisTime = ofGetElapsedTimef();
+        }
+    }
+};
+```
 
 ### Video Analysis with OpenFrameworks
 
