@@ -74,7 +74,7 @@ class MyApp : public ci::app::App {
 
 ```bash
 cd your-workspace/
-git clone https://github.com/yourusername/OllamaClient.git
+git clone https://github.com/yourusername/ollama-client.git
 cd your-project/
 ```
 
@@ -87,7 +87,7 @@ Add `../OllamaClient/include` to your project's include paths, then use:
 
 ```bash
 cd your-project/
-git submodule add https://github.com/yourusername/OllamaClient.git lib/OllamaClient
+git submodule add https://github.com/yourusername/ollama-client.git lib/OllamaClient
 git submodule update --init --recursive
 ```
 
